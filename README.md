@@ -21,3 +21,15 @@ Speech to Phonemes
 This is not for Android, but could run on a server that your app could access.
 
 There's no code to list here, but here are detailed instructions on how to get Speech-to-phoneme recognition set up using Sphinx: http://cmusphinx.sourceforge.net/wiki/phonemerecognition
+
+Detecting pre-recorded audio segments
+-------------------------------------
+
+A la Shazam/SoundHound, but could be applied to detecting any fixed sounds.
+
+See music fingerprinting code:
+
+* Open source [dejavu](https://github.com/worldveil/dejavu)
+* Echoprint from The Echonest: http://echoprint.me/
+
+More information about the subject: http://en.wikipedia.org/wiki/Acoustic_fingerprint
