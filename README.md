@@ -3,6 +3,8 @@ cs160-audio-examples
 
 (mostly) Android audio processing examples for UC Berkeley CS160, Spring 2014.
 
+More details for working with audio in cs160 can be found on our course wiki: http://husk.eecs.berkeley.edu/courses/cs160-sp14/index.php/Sound_Programming
+
 Speech to Text
 --------------
 
