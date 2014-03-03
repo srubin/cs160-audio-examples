@@ -1,4 +1,4 @@
-package com.example.pitchtracker;
+package com.example.lowpass;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -12,7 +12,7 @@ public class AudioProc {
 	}
 
 	private int mBufferSize;
-	private byte[] mBuffer;
+	public byte[] mBuffer;
 	private AudioRecord mRecorder;
 	private int mSampleRate;
 	private boolean mIsRecording = false;
@@ -61,6 +61,7 @@ public class AudioProc {
 			
 			@Override
 			public void run() {
+				android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
 				while (mIsRecording) {
 					int bufferReadResult = mRecorder.read(mBuffer, 0, mBufferSize);
 					AudioEvent audioEvent = new AudioEvent(mTarsosFormat, bufferReadResult);
