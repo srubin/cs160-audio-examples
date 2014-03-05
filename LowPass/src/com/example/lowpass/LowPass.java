@@ -8,17 +8,18 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import be.hogent.tarsos.dsp.AudioEvent;
 import be.hogent.tarsos.dsp.filters.LowPassFS;
-import be.hogent.tarsos.dsp.filters.LowPassSP;
 
 import com.example.lowpass.AudioProc.OnAudioEventListener;
 
 public class LowPass extends Activity implements OnAudioEventListener {
 
-	public static final int SAMPLE_RATE = 11025;
+	public static final int SAMPLE_RATE = 16000;
 	public static final String TAG = "LowPass";
 	private AudioProc mAudioProc;
 	private LowPassFS mLowPassFilter;
@@ -26,11 +27,23 @@ public class LowPass extends Activity implements OnAudioEventListener {
 	private AudioTrack mAudioTrack;
 	private SeekBar mFreqSeek;
 	private TextView mFreq;
+	private CheckBox mUseMicCheckbox;
+	private boolean mUseMic;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_low_pass);
+		
+		mUseMicCheckbox = (CheckBox)findViewById(R.id.useMic);
+		mUseMic = false;
+		mUseMicCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				mUseMic = isChecked;
+			}
+		});
 		
 		mFreqSeek = (SeekBar)findViewById(R.id.freqSeek);
 		mFreq = (TextView)findViewById(R.id.freq);
@@ -63,7 +76,7 @@ public class LowPass extends Activity implements OnAudioEventListener {
 		
 		
 
-		mAudioProc = new AudioProc(SAMPLE_RATE);
+		mAudioProc = new AudioProc(SAMPLE_RATE, this);
 		mAudioProc.setOnAudioEventListener(this);
 		
 		mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
@@ -85,10 +98,13 @@ public class LowPass extends Activity implements OnAudioEventListener {
 					mAudioTrack.stop();
 					mListenButton.setText("Start Loopback");
 				} else {
+					mAudioProc.useMic = mUseMic;
 					mAudioProc.listen();
 					mAudioTrack.play();
 					mListenButton.setText("Stop Loopback");
 				}
+
+
 			}
 		});
 	}

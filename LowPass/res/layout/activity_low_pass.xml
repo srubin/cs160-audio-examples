@@ -43,4 +43,12 @@
         android:layout_alignRight="@+id/freqSeek"
         android:text="0 Hz" />
 
+    <CheckBox
+        android:id="@+id/useMic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/freqSeek"
+        android:layout_alignParentBottom="true"
+        android:text="Use microphone" />
+
 </RelativeLayout>
