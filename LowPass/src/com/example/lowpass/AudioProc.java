@@ -1,5 +1,11 @@
-package com.example.pitchtracker;
+package com.example.lowpass;
 
+import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -12,15 +18,20 @@ public class AudioProc {
 	}
 
 	private int mBufferSize;
-	private byte[] mBuffer;
+	public byte[] mBuffer;
 	private AudioRecord mRecorder;
 	private int mSampleRate;
 	private boolean mIsRecording = false;
 	private be.hogent.tarsos.dsp.AudioFormat mTarsosFormat;
 	private AudioProc.OnAudioEventListener mOnAudioEventListener;
+	public boolean useMic;
+	private Context context;
+	private BufferedInputStream mBufStream;
+	private be.hogent.tarsos.dsp.AudioFormat mTarsosFormatForWavFile;
 
-	public AudioProc(int sampleRate) {
+	public AudioProc(int sampleRate, Context context) {
 		mSampleRate = sampleRate;
+		this.context = context;
 		mBufferSize = AudioRecord.getMinBufferSize(mSampleRate, AudioFormat.CHANNEL_IN_MONO,
 				AudioFormat.ENCODING_PCM_16BIT);
 		mBuffer = new byte[mBufferSize];
@@ -31,6 +42,12 @@ public class AudioProc {
 				mBufferSize);
 		mTarsosFormat = new be.hogent.tarsos.dsp.AudioFormat(
 				(float)mSampleRate, 16, 1, true, false);
+		
+		useMic = true;
+	
+
+		mBufStream = new BufferedInputStream(context.getResources().openRawResource(R.raw.cellobells));
+
 	}
 	
 	public int getBufferSize() {
@@ -42,7 +59,9 @@ public class AudioProc {
 	}
 	
 	public void listen() {
-		mRecorder.startRecording();
+		if (useMic) {
+			mRecorder.startRecording();
+		};
 		mIsRecording  = true;
 		processAudio();
 	}
@@ -61,10 +80,26 @@ public class AudioProc {
 			
 			@Override
 			public void run() {
+				android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
 				while (mIsRecording) {
-					int bufferReadResult = mRecorder.read(mBuffer, 0, mBufferSize);
-					AudioEvent audioEvent = new AudioEvent(mTarsosFormat, bufferReadResult);
-					audioEvent.setFloatBufferWithByteBuffer(mBuffer);
+					AudioEvent audioEvent;
+					if (useMic) {
+						int bufferReadResult = mRecorder.read(mBuffer, 0, mBufferSize);
+						audioEvent = new AudioEvent(mTarsosFormat, bufferReadResult);
+						audioEvent.setFloatBufferWithByteBuffer(mBuffer);
+					} else {
+						audioEvent = new AudioEvent(mTarsosFormat, mBufferSize);
+						try {
+							mBufStream.read(mBuffer, 0, mBufferSize);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						audioEvent.setFloatBufferWithByteBuffer(mBuffer);
+					}
+					
+					
+
 					if (mOnAudioEventListener != null) {
 						mOnAudioEventListener.processAudioProcEvent(audioEvent);	
 					}

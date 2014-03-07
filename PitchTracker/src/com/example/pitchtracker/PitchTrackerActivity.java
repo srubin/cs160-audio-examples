@@ -65,7 +65,6 @@ public class PitchTrackerActivity extends Activity implements AudioProc.OnAudioE
 	public void processAudioProcEvent(AudioEvent ae) {
 		// detect pitch
 		mPitchProcessor.process(ae);
-		Log.d(TAG, "Processing pitch");
 	}
 
 	@Override
